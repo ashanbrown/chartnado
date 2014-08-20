@@ -123,9 +123,33 @@ module Chartnado
             end
           }
         end
+
         if show_total
           [{name: 'Total',
-            data: totals.map {|k,v| [k, 0,] },
+            data: totals.map {|k,v| [k, 0] },
+            tooltip: totals.map {|k,v| [k, v] }
+           }] + new_series
+        else
+          new_series
+        end
+      elsif series.is_a?(Array) && series.first.is_a?(Array)
+        totals = Hash.new(0.0)
+        new_series = series.sort_by(&:first)
+        new_series = new_series.reverse if reverse_sort
+
+        new_series = new_series.map do |name, data|
+          {
+            name: name,
+            data: data.map do |k, v|
+              totals[k] += v if show_total
+              [k, v]
+            end
+          }
+        end
+
+        if show_total
+          [{name: 'Total',
+            data: totals.map {|k,v| [k, 0] },
             tooltip: totals.map {|k,v| [k, v] }
            }] + new_series
         else
