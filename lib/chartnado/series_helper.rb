@@ -13,7 +13,7 @@ module Chartnado
       if is_an_array_of_named_series?(series) || series.is_a?(Array) && series.first.is_a?(Array)
         series.map { |(name, data)| [name, series_product(val, data)] }
       elsif series.is_a?(Hash)
-        series.to_a.map do |(key, value)|
+        series.to_a.reduce({}) do |hash, (key, value)|
           if val.is_a?(Hash)
             if key.is_a?(Array)
               scalar = val[key.second]
@@ -24,8 +24,9 @@ module Chartnado
             scalar = val
           end
           scalar ||= 0
-          [key, scalar * value]
-        end.to_h
+          hash[key] = scalar * value
+          hash
+        end
       else
         series.map do |value|
           val * value
@@ -67,7 +68,6 @@ module Chartnado
           ]
         end
       elsif bottom_series.respond_to?(:reduce)
-        p bottom_series
         bottom_series.reduce({}) do |hash, (key, value)|
           hash[key] = series_ratio(top_series[key] || 0, value, multiplier: multiplier, precision: precision)
           hash
@@ -91,8 +91,6 @@ module Chartnado
         end
       elsif is_an_array_of_named_series?(series.first)
         series.flatten(1).group_by(&:first).map do |name, values|
-          p values
-          p values.map(&:second)
           data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
             values.each do |key, value|
               hash[key] += value
@@ -215,9 +213,10 @@ module Chartnado
     end
 
     def grouped_median(series)
-      series.group_by(&:first).map do |key, values|
-        [key, median(values.map(&:second))]
-      end.to_h
+      series.group_by(&:first).reduce({}) do |hash, (key, values)|
+        hash[key] = median(values.map(&:second))
+        hash
+      end
     end
 
     def grouped_mean_and_median(series)
@@ -236,9 +235,16 @@ module Chartnado
 
     def data_by_name(series)
       if is_an_array_of_named_series?(series)
-        series.to_h
+        series.reduce({}) do |hash, value|
+          hash[value.first] = value.second
+          hash
+        end
       else
-        series.index_by { |key| Array.wrap(key.first).first }.map { |name, (k,v)| [name, k => v] }.to_h
+        series.reduce({}) do |hash, (key, value)|
+          new_key = Array.wrap(key.first).first
+          hash[new_key] = {key => value }
+          hash
+        end
       end
     end
 
