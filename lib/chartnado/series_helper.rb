@@ -134,7 +134,7 @@ module Chartnado
         end
       elsif series.is_a?(Array) && series.first.is_a?(Array)
         totals = Hash.new(0.0)
-        new_series = series.sort_by(&:first)
+        new_series = series.sort_by { |item| item.first.to_s }
         new_series = new_series.reverse if reverse_sort
 
         new_series = new_series.map do |name, data|
