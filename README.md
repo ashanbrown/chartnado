@@ -20,12 +20,29 @@ If you are using `chartkick-remote`, you can enable Chartnado evaluation on your
 
 Chartkick::Remote.config.eval_block = lambda { |&block| Chartnado.chartnado_eval(&block) }  
 
-## Supported Vector Operations
+## Supported Vector Operations on Series
 
-* Hash * Scalar and Hash / Scalar
-* Hash * Hash
-* Hash / Hash
-* Hash +/- Hash
+* Single/Multiple-Series * Scalar
+* Single/Multiple-Series / Scalar
+* Single/Multiple-Series / Single Series
+* Single Series / Single Series
+* Multiple-Series / Single Series
+* Multiple-Series / Multiple Series
+* Single/Multiple-Series + Scalar
+
+A "Series" is a hash of values (i.e. `{ 2 => 4, 3 => 9 }`).  A "Multiple-Series" can either be specified in two ways:
+
+1. With the series identifier as the first element in each array that forms the key, as in:
+    ```ruby
+        {['series a', 0] => 1}, ['series b', 0] => 2}
+    ```
+
+1. With the series identifier as the first element in an array of single series, as in:
+    ```ruby
+        [['series a', {0 => 1}], ['series b' {0 => 2}]]
+    ```
+
+Both series in an operation must use the same format.
 
 ## Chartnado::SeriesHelper
 
