@@ -1,6 +1,6 @@
 require 'chartnado/chart'
 
-module Chartnado::ChartHelpers
+module Chartnado::Helpers::Chart
   include Chartnado::Chart
 
   def area_chart(*)
