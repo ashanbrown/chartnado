@@ -46,13 +46,32 @@ Both series in an operation must use the same format.
 
 ## Chartnado::SeriesHelper
 
+To include these, just add:
+
+`include Chartnado::SeriesHelper`
+
+### Operator Charts 
+
 Chartnado also offers direct access to the helpers that implement the above operators.
 
 * series_product
 * series_ratio
-* series_ratio
-* group_by
+* series_sum
 
-To include these, just add:
+### group_by
 
-`include Chartnado::SeriesHelper`
+While you can use ActiveRequest::Query.group to group results, you may find it useful to (a) make the grouping the first key, and (b) aggregate/rename groups.  `group_by` provides this ability as follows:
+
+```ruby
+  group_by('owners.id', Task.group_by_day(:completed_at)) { count }
+  
+```
+
+You can call it as: 
+
+    ```ruby
+    group_by(<expression>, scope, eval_block, block)
+    ```
+
+where *block* is the 
+

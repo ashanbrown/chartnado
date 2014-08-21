@@ -1,4 +1,6 @@
 require 'chartnado/version'
-require 'chartnado/series_helper'
+require 'chartnado/series'
+require 'chartnado/group_by'
+require 'chartnado/chart'
 require 'chartnado/evaluator'
 require 'chartnado/hash'

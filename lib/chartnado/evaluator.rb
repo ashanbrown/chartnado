@@ -26,7 +26,7 @@ module Chartnado
     end
 
     class OperatorEvaluator
-      include SeriesHelper
+      include Series
       extend Forwardable
 
       def initialize(object)
