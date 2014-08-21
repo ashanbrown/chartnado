@@ -131,7 +131,11 @@ module Chartnado
           end
         end
 
-        series_sum *series.map(&update_key_from_block)
+        if series.length > 0
+          series_sum *series.map(&update_key_from_block)
+        else
+          {}
+        end
       else
         series
       end
