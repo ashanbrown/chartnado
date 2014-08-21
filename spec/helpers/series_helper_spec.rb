@@ -23,7 +23,7 @@ describe Chartnado::SeriesHelper do
         expect(series_product(2, 3)).to eq 6
       end
     end
-    describe "multiplying an array of named series by a scalar" do
+    describe "multiplying an hash of named series by a scalar" do
       it "returns the product of a scalar and each named_series" do
         expect(
           series_product(
@@ -31,6 +31,16 @@ describe Chartnado::SeriesHelper do
             {[:series_a, 0] => 3,
              [:series_b, 1] => 4}
           )).to eq ({[:series_a, 0] => 6, [:series_b, 1] => 8})
+      end
+    end
+    describe "multiplying an array of named series by a scalar" do
+      it "returns the product of a scalar and each named_series" do
+        expect(
+          series_product(
+            2,
+            [[:series_a, {0 => 3}],
+             [:series_b, {1 => 4}]]
+          )).to eq [[:series_a, {0 => 6}], [:series_b, {1 => 8}]]
       end
     end
   end
@@ -49,6 +59,11 @@ describe Chartnado::SeriesHelper do
     describe "adding a scalar to a hash" do
       it "returns each item of the array with a scalar added" do
         expect(series_sum(2,{0 => 3})).to eq ({0 => 5})
+      end
+    end
+    describe "adding a scalar to an array of named series" do
+      it "returns each item of the array with a scalar added" do
+        expect(series_sum(2,[[:a, {0 => 3}]])).to eq ([[:a, {0 => 5}]])
       end
     end
     describe "adding two hashes" do
@@ -80,10 +95,22 @@ describe Chartnado::SeriesHelper do
                             {[:series_a, 0] => 2})).to eq ({[:series_a, 0] => 0.5})
       end
     end
+    describe "ratio of an array of named series to another array of named series" do
+      it "returns the ratio" do
+        expect(series_ratio([[:series_a, {0 => 1}]],
+                            [[:series_a, {0 => 2}]])).to eq [[:series_a, {0 => 0.5}]]
+      end
+    end
     describe "ratio of a named series to a non-named series" do
       it "returns the ratio" do
         expect(series_ratio({[:series_a, 0] => 1},
                             {0 => 2})).to eq ({[:series_a, 0] => 0.5})
+      end
+    end
+    describe "ratio of an array of named series to a non-named series" do
+      it "returns the ratio" do
+        expect(series_ratio([[:series_a, {0 => 1}]],
+                            {0 => 2})).to eq [[:series_a, {0 => 0.5}]]
       end
     end
     describe "ratio of a series to a scalar" do

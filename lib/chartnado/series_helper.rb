@@ -10,7 +10,7 @@ module Chartnado
       return with_precision(precision, val.to_f * series.to_f) unless series.respond_to?(:length)
       return series unless series.length > 0
 
-      if series.is_a?(Array) && series.first.is_a?(Array)
+      if is_an_array_of_named_series?(series) || series.is_a?(Array) && series.first.is_a?(Array)
         series.map { |(name, data)| [name, series_product(val, data)] }
       elsif series.is_a?(Hash)
         series.to_a.map do |(key, value)|
@@ -39,17 +39,35 @@ module Chartnado
       end
       if has_multiple_series?(top_series) && !has_multiple_series?(bottom_series)
         top_series_by_name = data_by_name(top_series)
-        bottom_series.reduce({}) do |hash, (key, value)|
-          top_series_by_name.keys.each do |name|
-            top_key = [name, *key]
-            top_value = top_series_by_name[name][top_key]
-            if top_value
-              hash[top_key] = series_ratio(top_value, value, multiplier: multiplier, precision: precision)
-            end
+        if is_an_array_of_named_series?(top_series)
+          top_series_by_name.map do |name, top_values|
+            [
+              name,
+              series_ratio(top_values, bottom_series, multiplier: multiplier, precision: precision)
+            ]
           end
-          hash
+        else
+          bottom_series.reduce({}) do |hash, (key, value)|
+            top_series_by_name.keys.each do |name|
+              top_key = [name, *key]
+              top_value = top_series_by_name[name][top_key]
+              if top_value
+                hash[top_key] = series_ratio(top_value, value, multiplier: multiplier, precision: precision)
+              end
+            end
+            hash
+          end
+        end
+      elsif is_an_array_of_named_series?(bottom_series)
+        top_series_by_name = data_by_name(top_series)
+        bottom_series.map do |(name, data)|
+          [
+            name,
+            series_ratio(top_series_by_name[name], data, multiplier: multiplier, precision: precision)
+          ]
         end
       elsif bottom_series.respond_to?(:reduce)
+        p bottom_series
         bottom_series.reduce({}) do |hash, (key, value)|
           hash[key] = series_ratio(top_series[key] || 0, value, multiplier: multiplier, precision: precision)
           hash
@@ -70,6 +88,20 @@ module Chartnado
         keys.reduce({}) do |hash, key|
           hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
           hash
+        end
+      elsif is_an_array_of_named_series?(series.first)
+        series.flatten(1).group_by(&:first).map do |name, values|
+          p values
+          p values.map(&:second)
+          data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
+            values.each do |key, value|
+              hash[key] += value
+            end
+            hash
+          end
+          [
+            name, data
+          ]
         end
       elsif series.first.is_a?(Array)
         series.map { |s| s.reduce(:+) + scalar_sum }
@@ -203,7 +235,11 @@ module Chartnado
     private
 
     def data_by_name(series)
-      series.index_by { |key| Array.wrap(key.first).first }.map { |name, (k,v)| [name, k => v] }.to_h
+      if is_an_array_of_named_series?(series)
+        series.to_h
+      else
+        series.index_by { |key| Array.wrap(key.first).first }.map { |name, (k,v)| [name, k => v] }.to_h
+      end
     end
 
     def series_names(series)
@@ -211,7 +247,11 @@ module Chartnado
     end
 
     def has_multiple_series?(series)
-      series.is_a?(Hash) && series.first && series.first[0].is_a?(Array) && series.first[0].length > 1
+      is_an_array_of_named_series?(series) || series.is_a?(Hash) && series.first && series.first[0].is_a?(Array) && series.first[0].length > 1
+    end
+
+    def is_an_array_of_named_series?(series)
+      series.is_a?(Array) && series.first.second.is_a?(Hash)
     end
 
     def dimensions(series)
