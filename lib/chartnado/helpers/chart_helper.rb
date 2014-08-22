@@ -12,15 +12,15 @@ module Chartnado::Helpers
       super
     end
 
-    def area_chart_with_dsl(*args, ** options, &block)
+    def area_chart_with_chartnado(*args, ** options, &block)
       render_chart(*args, **options) do |chartkick_options, json_options|
-        area_chart_without_dsl(**chartkick_options) do
+        area_chart_without_chartnado(**chartkick_options) do
           evaluate_chart_block(**json_options, &block)
         end
       end
     end
 
-    alias_method_chain :area_chart, :dsl
+    alias_method_chain :area_chart, :chartnado
 
     def stacked_area_chart(*args, ** options, &block)
       render_chart(*args, **options) do |chartkick_options, json_options|
@@ -37,7 +37,7 @@ module Chartnado::Helpers
             }
           }
         )
-        area_chart_without_dsl(**new_options) do
+        area_chart_without_chartnado(**new_options) do
           evaluate_chart_block(json_options.reverse_merge(show_total: true, reverse_sort: true), &block)
         end
       end
@@ -58,13 +58,15 @@ module Chartnado::Helpers
     end
 
     %i{geo_chart pie_chart column_chart}.each do |chart_type|
-      define_method(chart_type) do |*args, ** options, &block|
-        render_chart(*args, **options) do |chartkick_options, json_options|
-          super(**chartkick_options) do
-            evaluate_chart_block(**json_options, &block)
+      define_method(:"#{chart_type}_with_chartnado") do |*args,
+        ** options, &block |
+        render_chart(*args, ** options) do |chartkick_options, json_options|
+          send(:"#{chart_type}_without_chartnado", ** chartkick_options) do
+            evaluate_chart_block(** json_options, &block)
           end
         end
       end
+      alias_method_chain chart_type, :chartnado
     end
 
     private
