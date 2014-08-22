@@ -8,20 +8,6 @@ module Chartnado::Helpers
     include Chartkick::Helper
     include Chartnado::Chart
 
-    def area_chart(*)
-      super
-    end
-
-    def area_chart_with_chartnado(*args, ** options, &block)
-      render_chart(*args, **options) do |chartkick_options, json_options|
-        area_chart_without_chartnado(**chartkick_options) do
-          evaluate_chart_block(**json_options, &block)
-        end
-      end
-    end
-
-    alias_method_chain :area_chart, :chartnado
-
     def stacked_area_chart(*args, ** options, &block)
       render_chart(*args, **options) do |chartkick_options, json_options|
         new_options = chartkick_options.reverse_merge(
@@ -57,7 +43,7 @@ module Chartnado::Helpers
       end
     end
 
-    %i{geo_chart pie_chart column_chart}.each do |chart_type|
+    %i{geo_chart pie_chart column_chart area_chart}.each do |chart_type|
       define_method(:"#{chart_type}_with_chartnado") do |*args,
         ** options, &block |
         render_chart(*args, ** options) do |chartkick_options, json_options|
