@@ -1,6 +1,8 @@
 require 'codeclimate-test-reporter'
 require 'chartnado/chartnado'
 
+require 'pry'
+
 CodeClimate::TestReporter.start
 
 module Rails

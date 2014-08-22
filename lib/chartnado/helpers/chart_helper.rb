@@ -1,100 +1,108 @@
 require 'chartnado/chart'
+require 'chartkick'
 
-module Chartnado::Helpers::Chart
-  include Chartnado::Chart
+# These helpers can be included in your view using `helper Chartnado::Helpers::Chart`.
+# They override the default chartkick chart rendering methods with ones that support chartnado DSL.
+module Chartnado::Helpers
+  module Chart
+    include Chartkick::Helper
+    include Chartnado::Chart
 
-  def area_chart(*)
-    super
-  end
+    def area_chart(*)
+      super
+    end
 
-  def area_chart_with_dsl(*args, ** options, &block)
-    render_chart(*args, **options) do |chartkick_options, json_options|
-      area_chart_without_dsl(**chartkick_options) do
-        evaluate_chart_block(**json_options, &block)
+    def area_chart_with_dsl(*args, ** options, &block)
+      render_chart(*args, **options) do |chartkick_options, json_options|
+        area_chart_without_dsl(**chartkick_options) do
+          evaluate_chart_block(**json_options, &block)
+        end
       end
     end
-  end
 
-  alias_method_chain :area_chart, :dsl
+    alias_method_chain :area_chart, :dsl
 
-  def stacked_area_chart(*args, ** options, &block)
-    render_chart(*args, **options) do |chartkick_options, json_options|
-      new_options = chartkick_options.reverse_merge(
-        stacked: true,
-        library: {
-          focusTarget: 'category',
-          series: {
-            0 => {
-              lineWidth: 0,
-              pointSize: 0,
-              visibleInLegend: false
+    def stacked_area_chart(*args, ** options, &block)
+      render_chart(*args, **options) do |chartkick_options, json_options|
+        new_options = chartkick_options.reverse_merge(
+          stacked: true,
+          library: {
+            focusTarget: 'category',
+            series: {
+              0 => {
+                lineWidth: 0,
+                pointSize: 0,
+                visibleInLegend: false
+              }
             }
           }
-        }
-      )
-      area_chart_without_dsl(**new_options) do
-        evaluate_chart_block(json_options.reverse_merge(show_total: true, reverse_sort: true), &block)
-      end
-    end
-  end
-
-  def line_chart(*args, ** options, &block)
-    render_chart(*args, **options) do |chartkick_options, json_options|
-      new_options = chartkick_options.reverse_merge(
-        library: {
-          curveType: "none",
-          pointSize: 2,
-          focusTarget: 'category'
-        })
-      super(**new_options) do
-        evaluate_chart_block(**json_options, &block)
-      end
-    end
-  end
-
-  def pie_chart(*args, ** options, &block)
-    render_chart(*args, **options) do |chartkick_options, json_options|
-      super(*chartkick_options) do
-        evaluate_chart_block(**json_options, &block)
-      end
-    end
-  end
-
-  def column_chart(*args, ** options, &block)
-    render_chart(*args, **options) do |chartkick_options, json_options|
-      super(**chartkick_options) do
-        evaluate_chart_block(**json_options, &block)
-      end
-    end
-  end
-
-  private
-
-  def render_chart(*args, **options, &block)
-    name = args[0] or raise "chart must have a name"
-    json_options = {}
-    chartkick_options = options.dup
-
-    if args.length > 1
-      if args.last.is_a?(Hash)
-        json_options = chartkick_options
-        chartkick_options = args[1].dup
-      end
-      args.select { |arg| arg.is_a?(Symbol) }.each do |key|
-        json_options[key] = true unless json_options.has_key?(key)
+        )
+        area_chart_without_dsl(**new_options) do
+          evaluate_chart_block(json_options.reverse_merge(show_total: true, reverse_sort: true), &block)
+        end
       end
     end
 
-    if json_options[:percentage]
-      chartkick_options.reverse_merge!(max: 100.0)
+    def line_chart(*args, ** options, &block)
+      render_chart(*args, **options) do |chartkick_options, json_options|
+        new_options = chartkick_options.reverse_merge(
+          library: {
+            curveType: "none",
+            pointSize: 2,
+            focusTarget: 'category'
+          })
+        super(**new_options) do
+          evaluate_chart_block(**json_options, &block)
+        end
+      end
     end
 
-    haml_concat(render(layout: 'admin/charts/chart', locals: {title: name}) do
-      block.call(chartkick_options, json_options)
-    end)
-  end
+    %i{geo_chart pie_chart column_chart}.each do |chart_type|
+      define_method(chart_type) do |*args, ** options, &block|
+        render_chart(*args, **options) do |chartkick_options, json_options|
+          super(**chartkick_options) do
+            evaluate_chart_block(**json_options, &block)
+          end
+        end
+      end
+    end
 
-  def evaluate_chart_block(*args, &block)
-    chart_json(Chartnado.with_chartnado_dsl(&block), *args)
+    private
+
+    def render_chart(*args, **options, &render_block)
+      json_options = {}
+      chartkick_options = options.dup
+
+      if args.length > 1
+        if args.last.is_a?(Hash)
+          json_options = chartkick_options
+          chartkick_options = args[1].dup
+        end
+        args.select { |arg| arg.is_a?(Symbol) }.each do |key|
+          json_options[key] = true unless json_options.has_key?(key)
+        end
+      end
+
+      if json_options[:percentage]
+        chartkick_options.reverse_merge!(max: 100.0)
+      end
+
+      options = controller.chartnado_options if controller.respond_to?(:chartnado_options)
+      options ||= {}
+
+      helper = self
+
+      renderer = -> { helper.instance_exec(chartkick_options, json_options, &render_block) }
+
+      if options[:wrapper_proc]
+        controller.instance_exec(*args, renderer, **options, &options[:wrapper_proc])
+      else
+        renderer.call
+      end
+    end
+
+    def evaluate_chart_block(*args, &block)
+      chart_json(Chartnado.with_chartnado_dsl(&block), *args)
+    end
   end
 end

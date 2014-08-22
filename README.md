@@ -2,7 +2,7 @@
 
 ## Usage
 
-Chartnado allows basic vector-style operations directly on to make it easy to feed them into [`chartkick`](http://ankane.github.io/chartkick/) (and [`chartkick-remote`](http://github.com/dontfidget/chartkick-remote)).
+Chartnado layers on top of [`chartkick`](http://ankane.github.io/chartkick/) and [`chartkick-remote`](http://github.com/dontfidget/chartkick-remote) allowing basic vector-style operations directly on to make it easy to feed them into charts.
 
 In your controller, add the following to tell the controller to respond to json requests for chart data:
 
@@ -13,14 +13,12 @@ include Chartnado
 Then in your views, now in your views, you can write an expression to show the average tasks completed per today relative to total tasks:
 
 ```ruby
-<%= line_chart chartnado_eval { Task.group_by_day(:completed_at).count / Task.count } %>
+<%= line_chart { Task.group_by_day(:completed_at).count / Task.count } %>
 ```
 
-If you are using `chartkick-remote`, you can enable Chartnado evaluation on your block by default, by setting a config setting:
-
-Chartkick::Remote.config.eval_block = lambda { |&block| Chartnado.chartnado_eval(&block) }  
-
 ## Supported Vector Operations on Series
+
+Chartnado supports the following operations on series/multiple-series data:
 
 * Single/Multiple-Series * Scalar
 * Single/Multiple-Series / Scalar
@@ -39,24 +37,22 @@ A "Series" is a hash of values (i.e. `{ 2 => 4, 3 => 9 }`).  A "Multiple-Series"
 
 1. With the series identifier as the first element in an array of single series, as in:
     ```ruby
-        [['series a', {0 => 1}], ['series b' {0 => 2}]]
+        [['series a', {0 => 1}], ['series b', {0 => 2}]]
     ```
 
-Both series in an operation must use the same format.
+All series in an operation must use the same format.
 
 ## Chartnado::SeriesHelper
-
-To include these, just add:
-
-`include Chartnado::SeriesHelper`
-
-### Operator Charts 
 
 Chartnado also offers direct access to the helpers that implement the above operators.
 
 * series_product
 * series_ratio
 * series_sum
+
+To include these, just add:
+
+`include Chartnado::Series`
 
 ### group_by
 
@@ -69,9 +65,27 @@ While you can use ActiveRequest::Query.group to group results, you may find it u
 
 You can call it as: 
 
-    ```ruby
-    group_by(<expression>, scope, eval_block, block)
-    ```
+```ruby
+group_by(<expression>, scope, optional_label_block, &eval_block)
+```
 
-where *block* is the 
+where *block* calls the aggregating function you want applied to scope and *optional_label_block* is passed each key and data, so you can change the key (and even the data if you like).  The result for hash entries with matching keys is summed. 
 
+To include these, just add:
+
+`include Chartnado::GroupBy`
+
+
+### Wrapping the chart renderer
+
+You can wrap the render method in your controller.
+
+```ruby
+chartnado_wrapper :custom_renderer
+
+def custom_renderer(*args, **options, &block)
+  title = options[:title]
+  render 'my-view', title: title, &block
+end
+
+```
