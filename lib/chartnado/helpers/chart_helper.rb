@@ -1,11 +1,13 @@
 require 'chartnado/chart'
 require 'chartkick'
+require 'chartkick/remote/helper'
 
 # These helpers can be included in your view using `helper Chartnado::Helpers::Chart`.
 # They override the default chartkick chart rendering methods with ones that support chartnado DSL.
 module Chartnado::Helpers
   module Chart
     include Chartkick::Helper
+    include Chartkick::Remote::Helper
     include Chartnado::Chart
 
     def stacked_area_chart(*args, ** options, &block)
@@ -43,9 +45,9 @@ module Chartnado::Helpers
       end
     end
 
-    %i{geo_chart pie_chart column_chart area_chart}.each do |chart_type|
-      define_method(:"#{chart_type}_with_chartnado") do |*args,
-        ** options, &block |
+    %i{geo_chart pie_chart column_chart bar_chart area_chart}.each do |chart_type|
+      define_method(:"#{chart_type}_with_chartnado") do |*args, ** options, &block |
+        puts 'here'
         render_chart(*args, ** options) do |chartkick_options, json_options|
           send(:"#{chart_type}_without_chartnado", ** chartkick_options) do
             evaluate_chart_block(** json_options, &block)

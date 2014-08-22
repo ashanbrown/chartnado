@@ -6,15 +6,26 @@ require 'chartnado/evaluator'
 require 'chartnado/helpers/chart_helper'
 require 'chartnado/helpers/series_helper'
 require 'chartnado/hash'
+require 'chartkick/remote'
 
 module Chartnado
   extend ActiveSupport::Concern
   attr_accessor :chartnado_options
 
+  included do
+    include Chartkick::Remote
+
+    helper Chartnado::Helpers::Chart
+  end
+
   module ClassMethods
-    def chartnado_wrapper(symbol = nil, **options, &block)
-      block ||= -> (*args) do
-        send(symbol, *args)
+    def chartnado_wrapper(wrapper_symbol = nil, **options, &block)
+      unless block
+        helper_method wrapper_symbol
+        block = -> (*args, **options) do
+          render_block = args.pop
+          send(wrapper_symbol, *args, **options, &render_block)
+        end
       end
 
       action_filter_options = options.extract!(:only, :except)
