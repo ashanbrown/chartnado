@@ -1,7 +1,6 @@
 require 'chartnado/version'
 require 'chartnado/series'
 require 'chartnado/group_by'
-require 'chartnado/chart'
 require 'chartnado/evaluator'
 require 'chartnado/helpers/chart_helper'
 require 'chartnado/helpers/series_helper'

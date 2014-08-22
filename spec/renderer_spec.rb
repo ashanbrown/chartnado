@@ -1,13 +1,11 @@
 require 'spec_helper'
 
-describe Chartnado::Chart do
-  before do
-    class << self
-      include Chartnado::Chart
-    end
-  end
-
+describe Chartnado::Renderer do
   describe "#chart_json" do
+    def chart_json(*series)
+      Chartnado::Renderer.new(nil, nil).chart_json(*series)
+    end
+
     describe "for data formatted as a hash" do
       it "can generate chartkick compatible series" do
         expect(chart_json({[:a, 1] => 10, [:b, 1] => 20})).
