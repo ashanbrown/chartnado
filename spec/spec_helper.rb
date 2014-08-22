@@ -1,7 +1,11 @@
 require 'codeclimate-test-reporter'
 require 'chartnado/chartnado'
+require 'rspec/mocks'
 
-require 'pry'
+begin
+  require 'pry'
+rescue LoadError
+end
 
 CodeClimate::TestReporter.start
 

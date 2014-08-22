@@ -97,7 +97,7 @@ module Chartnado::Helpers
       renderer = -> { helper.instance_exec(chartkick_options, json_options, &render_block) }
 
       if options[:wrapper_proc]
-        controller.instance_exec(*args, renderer, **options, &options[:wrapper_proc])
+        helper.instance_exec(*args, renderer, **options, &options[:wrapper_proc])
       else
         renderer.call
       end

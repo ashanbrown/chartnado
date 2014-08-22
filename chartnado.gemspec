@@ -26,6 +26,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", '~> 10.3'
   spec.add_development_dependency "rspec", '~> 3.0'
   spec.add_development_dependency "rspec-core", '~> 3.0'
+  spec.add_development_dependency "rspec-mocks", '~> 3.0'
   spec.add_development_dependency "rspec-rails", '~> 3.0'
   spec.add_development_dependency "travis-lint", '~> 1.8'
   spec.add_development_dependency "codeclimate-test-reporter", '~> 0.3'
