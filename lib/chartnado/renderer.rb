@@ -117,7 +117,11 @@ class Chartnado::Renderer
         end
       end
     else
-      series
+      if series.respond_to?(:map)
+        series
+      else
+        [['Total', series]]
+      end
     end
   end
 end

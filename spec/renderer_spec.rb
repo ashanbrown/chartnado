@@ -40,5 +40,11 @@ describe Chartnado::Renderer do
                  {name: :b, data: [[1, 20]]}]
       end
     end
+    describe "for data that is just a scalar" do
+      it "shows the scalar as the total" do
+        expect(chart_json(10)).
+          to eq [['Total', 10]]
+      end
+    end
   end
 end
