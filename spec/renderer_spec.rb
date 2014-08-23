@@ -2,8 +2,8 @@ require 'spec_helper'
 
 describe Chartnado::Renderer do
   describe "#chart_json" do
-    def chart_json(*series)
-      Chartnado::Renderer.new(nil, nil).chart_json(*series)
+    def chart_json(*series, **options)
+      Chartnado::Renderer.new(nil, nil).chart_json(*series, **options)
     end
 
     describe "for data formatted as a hash" do
@@ -16,6 +16,16 @@ describe Chartnado::Renderer do
           to eq [{name: 'Total', data: [[1, 0]], tooltip: [[1, 30.0]]},
                  {name: :a, data: [[1, 10]]},
                  {name: :b, data: [[1, 20]]}]
+      end
+      describe "with multiple scalar series" do
+        it "can handle scalars" do
+          expect(chart_json({:a => 10, :b => 20})).
+            to eq([[:a, 10], [:b, 20]])
+        end
+        it "can add totals" do
+          expect(chart_json({:a => 10, :b => 20}, show_total: true)).
+            to eq([[:a, 10], [:b, 20], ['Total', 30]])
+        end
       end
     end
     describe "for data formatted as an array" do
