@@ -1,9 +1,9 @@
 language: ruby
 rvm:
-  - 2.1.2
-  - 2.0.0
-# uncomment this line if your project needs to run something other than `rake`:
-# script: bundle exec rspec spec
-
-script:
-  CODECLIMATE_REPO_TOKEN= bundle exec rake
+- 2.1.2
+- 2.0.0
+script: CODECLIMATE_REPO_TOKEN= bundle exec rake
+env:
+  secure: 
+  global:
+    secure: Fx4K8sFJuDs947c/xPbif4v1TEetRu5pqEVXBIjoa7JcddbfKKnNhQh8w8FRw/1LNJcWuHVK/S+C6U3Zj3zP0OcWS1OhZrZuqKJCvWkZ6QkhJxMI83smdwD9G7G0X6f5OefPBr2Mggz/KB9BppbeZGmsKp912Y+yzivUFGE4ByU=
