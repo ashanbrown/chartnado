@@ -6,6 +6,7 @@ require 'chartnado/helpers/chart_helper'
 require 'chartnado/helpers/series_helper'
 require 'chartnado/hash'
 require 'chartkick/remote'
+require 'chartnado/engine' if defined?(Rails)
 
 module Chartnado
   extend ActiveSupport::Concern

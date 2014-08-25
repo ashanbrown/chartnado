@@ -1,5 +1,5 @@
 require 'codeclimate-test-reporter'
-require 'chartnado/chartnado'
+require 'chartnado'
 require 'rspec/mocks'
 
 begin
