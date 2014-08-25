@@ -1,4 +1,13 @@
 require 'codeclimate-test-reporter'
+
+CodeClimate::TestReporter.start
+
+begin
+  require 'coveralls'
+  Coveralls.wear!
+rescue LoadError
+end
+
 require 'chartnado'
 require 'rspec/mocks'
 
@@ -7,7 +16,6 @@ begin
 rescue LoadError
 end
 
-CodeClimate::TestReporter.start
 
 module Rails
   def self.application

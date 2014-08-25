@@ -31,5 +31,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec-rails", '~> 3.0'
   spec.add_development_dependency "travis-lint", '~> 1.8'
   spec.add_development_dependency "codeclimate-test-reporter", '~> 0.3'
+  spec.add_development_dependency "coveralls", '~> 0.3'
   # spec.add_development_dependency "rspec-html-matchers", '~> 0.6.1', '>= 0.6.1'
 end
