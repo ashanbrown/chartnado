@@ -1,6 +1,6 @@
 # Chartnado [![Gem Version](https://badge.fury.io/rb/chartnado.svg)](http://badge.fury.io/rb/chartnado)&nbsp;[![Travis CI Status](https://travis-ci.org/dontfidget/chartnado.png?branch=master)](https://travis-ci.org/dontfidget/chartnado)&nbsp;[![Code Climate](https://codeclimate.com/github/dontfidget/chartnado.png)](https://codeclimate.com/github/dontfidget/chartnado)&nbsp;[![Code Climate](https://codeclimate.com/github/dontfidget/chartnado/coverage.png)](https://codeclimate.com/github/dontfidget/chartnado)&nbsp;[![Dependency Status](https://gemnasium.com/dontfidget/chartnado.svg)](https://gemnasium.com/dontfidget/chartnado)
 
-Chartnado layers on top of [`chartkick`](http://ankane.github.io/chartkick/) and [`chartkick-remote`](http://github.com/dontfidget/chartkick-remote) allowing basic vector-style operations directly on to make it easy to feed them into charts.  It also provides some useful defaults and the ability to show totals on charts when using google charts.
+Chartnado layers on top of [`chartkick`](http://ankane.github.io/chartkick/) and [`chartkick-remote`](http://github.com/dontfidget/chartkick-remote) allowing basic vector-style operations directly on to make it easy to feed them into charts.  It also provides some useful defaults and the ability to show totals on pie and stacked area charts when using google charts.
 
 ## Usage
 
@@ -55,6 +55,21 @@ A "Series" is a hash of values (i.e. `{ 2 => 4, 3 => 9 }`).  A "Multiple-Series"
     ```
 
 All series in an operation must use the same format.
+
+## Remote Requests
+
+By default requests for data in blocks, will be fetched remotely, unless `remote: false` is passed as an option to *chartkick_remote*.  Using this methodology, it's easy to write a page that makes many, many json requests, which may swamp your server and possibly even time out if you have a global `timeout` value set for your ajax requests.  @maccman's jquery.ajax.queue.coffee script provides a basic queueing transport layer for ajax requests which I've modified to provide an option to set the maximum number of requests that can be made in parallel (see https://gist.github.com/dontfidget/1ad9ab33971b64fe6fef).  This is provided as part of Chartnado and you can include it in your javascript manifest like this:
+
+```
+//= require jquery.ajax.queue-concurrent
+```
+  
+Chartnado extends chartkick to accept an *ajaxOptions* hash, which can be passed via chartkick_remote, which means you can then specify the maximum number of allowable requests globally for your page as follows:
+
+
+```
+chartkick_remote ajaxOptions: {queue: true, queueMaxConcurrency: 2} 
+```
 
 ## Chartnado::SeriesHelper
 
