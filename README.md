@@ -58,14 +58,13 @@ All series in an operation must use the same format.
 
 ## Remote Requests
 
-By default requests for data in blocks, will be fetched remotely, unless `remote: false` is passed as an option to *chartkick_remote*.  Using this methodology, it's easy to write a page that makes many, many json requests, which may swamp your server and possibly even time out if you have a global `timeout` value set for your ajax requests.  @maccman's jquery.ajax.queue.coffee script provides a basic queueing transport layer for ajax requests which I've modified to provide an option to set the maximum number of requests that can be made in parallel (see https://gist.github.com/dontfidget/1ad9ab33971b64fe6fef).  This is provided as part of Chartnado and you can include it in your javascript manifest like this:
+By default requests for data in blocks, will be fetched remotely, unless `remote: false` is passed as an option to *chartkick_remote*.  Using this methodology, it's easy to write a page that makes many, many json requests, which may swamp your server and possibly even time out if you have a global `timeout` value set for your ajax requests.  @maccman's jquery.ajax.queue.coffee script provides a basic queueing transport layer for ajax requests which I've modified to provide an option to set the maximum number of requests that can be made in parallel (see https://gist.github.com/dontfidget/1ad9ab33971b64fe6fef).  This is provided as an asset as part of chartkick-remote and you can include it in your javascript manifest like this:
 
 ```
 //= require jquery.ajax.queue-concurrent
 ```
   
 Chartnado extends chartkick to accept an *ajaxOptions* hash, which can be passed via chartkick_remote, which means you can then specify the maximum number of allowable requests globally for your page as follows:
-
 
 ```
 chartkick_remote ajaxOptions: {queue: true, queueMaxConcurrency: 2} 
