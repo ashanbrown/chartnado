@@ -10,7 +10,7 @@ In your controller, add the following to tell the controller to respond to json 
 include Chartnado
 ```
 
-Then in your views, now in your views, you can write an expression to show the average tasks completed per today relative to total tasks:
+Then in your views, you can write an expression to show the average tasks completed per today relative to total tasks like this:
 
 ```ruby
 <%= line_chart { Task.group_by_day(:completed_at).count / Task.count } %>
