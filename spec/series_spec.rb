@@ -120,7 +120,7 @@ describe Chartnado::Series do
     end
     describe "ratio of a hash of named series to a non-named series" do
       it "returns the ratio" do
-        expect(series_ratio([[:series_a, {0 => 1}]].to_h,
+        expect(series_ratio({:series_a => {0 => 1}},
                             {0 => 2})).to eq [[:series_a, {0 => 0.5}]]
       end
     end
