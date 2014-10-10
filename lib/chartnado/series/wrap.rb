@@ -170,8 +170,8 @@ module Chartnado
       def data_by_name
         return self if hash_of_named_series?
         result = if array_of_named_series?
-          reduce({}) do |hash, value|
-            hash[value.first] = value.second
+          reduce({}) do |hash, (name, values)|
+            hash[name] = values
             hash
           end
         else
