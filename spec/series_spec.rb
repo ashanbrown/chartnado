@@ -124,8 +124,9 @@ describe Chartnado::Series do
                             {0 => 2})).to eq [[:series_a, {0 => 0.5}]]
       end
     end
+
     describe "ratio of a series to a scalar" do
-      xit "returns the ratio" do
+      it "returns the ratio" do
         expect(series_ratio({0 => 1}, 2)).to eq ({0 => 0.5})
       end
     end
