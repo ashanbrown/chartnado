@@ -17,9 +17,9 @@ module Chartnado
         return __getobj__ unless length > 0
 
         if array_of_named_series? || array? && first.is_a?(Array)
-          map { |(name, data)| [name, wrap(data) * factor] }
+          result = map { |(name, data)| [name, wrap(data) * factor] }
         elsif hash?
-          to_a.reduce({}) do |hash, (key, value)|
+          result = to_a.reduce({}) do |hash, (key, value)|
             if factor.hash?
               if key.is_a?(Array)
                 scalar = factor[key.second]
@@ -34,10 +34,12 @@ module Chartnado
             hash
           end
         else
-          map do |value|
+          result = map do |value|
             factor * value
           end
         end
+
+        wrap(result)
       end
 
       def add(*series, scalar_sum: 0.0)

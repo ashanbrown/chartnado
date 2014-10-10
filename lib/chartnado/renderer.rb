@@ -47,8 +47,9 @@ class Chartnado::Renderer
   end
 
   def chart_json(series, show_total: false, reverse_sort: false, percentage: false)
-    series = series_product(100.0, series) if percentage
-    if series.is_a?(Hash)
+    series = Chartnado::Series::Wrap[series]
+    series *= 100.0 if percentage
+    if series.hash?
       if (key = series.keys.first) and key.is_a?(Array) and key.size == 2
         totals = Hash.new(0.0)
         new_series = series.group_by{|k, v| k[0] }.sort_by { |k| k.to_s }
@@ -82,7 +83,7 @@ class Chartnado::Renderer
           new_series
         end
       end
-    elsif series.is_a?(Array) && series.first.is_a?(Array)
+    elsif series.array? && series.first.is_a?(Array)
       if series.first.second.respond_to?(:map)
         totals = Hash.new(0.0)
         new_series = series.sort_by { |item| item.first.to_s }
