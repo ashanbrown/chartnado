@@ -14,7 +14,7 @@ module Chartnado
 
         return factor.times(self, precision: precision) if factor.dimensions > dimensions
         return with_precision(precision, factor.to_f * to_f) unless dimensions > 1
-        return __getobj__ unless length > 0
+        return self unless length > 0
 
         if array_of_named_series? || array? && first.is_a?(Array)
           result = map { |(name, data)| [name, wrap(data) * factor] }
@@ -45,7 +45,7 @@ module Chartnado
       def add(*series, scalar_sum: 0.0)
         (series, scalars) = [__getobj__, *series].partition { |s| s.respond_to?(:map) }
         scalar_sum += scalars.reduce(:+) || 0.0
-        return scalar_sum unless series.present?
+        return wrap(scalar_sum) unless series.present?
 
         if wrap(series.first).has_separate_named_series?
           result = series.map(&:to_a).flatten(1).group_by(&:first).map do |name, values|
