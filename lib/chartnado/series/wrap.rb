@@ -110,7 +110,7 @@ module Chartnado
           end
         elsif bottom.respond_to?(:reduce)
           bottom.reduce({}) do |hash, (key, value)|
-            hash[key] = Wrap[self[key] || 0].
+            hash[key] = wrap(self[key] || 0).
               over(value, multiplier: multiplier, precision: precision)
             hash
           end
