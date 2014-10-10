@@ -35,7 +35,7 @@ module Chartnado::Helpers
       end.render(*args, **options)
     end
 
-    def pie_chart(*args, **options, &block)
+    def pie_chart_with_chartnado(*args, **options, &block)
       Chartnado::Renderer.new(self, block) do |chartkick_options, json_options, data_block|
         new_json_options = json_options.reverse_merge(show_total: true)
         new_options = chartkick_options.reverse_merge!(
