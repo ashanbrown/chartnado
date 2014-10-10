@@ -115,7 +115,6 @@ module Chartnado
             hash
           end
         else
-          p 'here'
           with_precision(precision, to_f * multiplier.to_f / bottom.to_f)
         end
       end
