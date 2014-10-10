@@ -16,7 +16,7 @@ module Chartnado
         return with_precision(precision, factor.to_f * to_f) unless dimensions > 1
         return self unless length > 0
 
-        if array_of_named_series? || array? && first.is_a?(Array)
+        if has_separate_named_series? || array? && first.is_a?(Array)
           result = map { |(name, data)| [name, wrap(data) * factor] }
         elsif hash?
           result = to_a.reduce({}) do |hash, (key, value)|
