@@ -14,7 +14,12 @@ module Chartnado::Helpers
         new_options = chartkick_options.reverse_merge(
           stacked: true,
           library: {
-            focusTarget: 'category',
+            focusTarget: 'category'
+          }
+        )
+        new_json_options = json_options.reverse_merge(show_total: true, reverse_sort: true)
+        new_options.reverse_merge!(
+          library: {
             series: {
               0 => {
                 lineWidth: 0,
@@ -23,9 +28,29 @@ module Chartnado::Helpers
               }
             }
           }
-        )
+        ) if new_json_options[:show_total]
         area_chart_without_chartnado(**new_options) do
-          data_block.call(json_options.reverse_merge(show_total: true, reverse_sort: true))
+          data_block.call(new_json_options)
+        end
+      end.render(*args, **options)
+    end
+
+    def pie_chart(*args, **options, &block)
+      Chartnado::Renderer.new(self, block) do |chartkick_options, json_options, data_block|
+        new_json_options = json_options.reverse_merge(show_total: true)
+        new_options = chartkick_options.reverse_merge!(
+          library: {
+            series: {
+              0 => {
+                lineWidth: 0,
+                pointSize: 0,
+                visibleInLegend: false
+              }
+            }
+          }
+        ) if new_json_options[:show_total]
+        pie_chart_without_chartnado(**new_options) do
+          data_block.call(new_json_options)
         end
       end.render(*args, **options)
     end
