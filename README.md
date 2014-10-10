@@ -16,6 +16,8 @@ Then in your views, you can write an expression to show the average tasks comple
 <%= line_chart { Task.group_by_day(:completed_at).count / Task.count } %>
 ```
 
+See the demo of chartkick-remote and Chartnado at http://chartkick-remote-demo.heroku.com.
+
 ## Totals
 
 By default chartnado adds totals to pie and stacked area charts using some hacky settings for google charts.  To get the total to appear, you need to use the chartnado version of the chartkick javascript called `chartkick-chartnado.js` instead of `chartkick.js`.  If you are including the javascript in sprockets manifest file, this:
