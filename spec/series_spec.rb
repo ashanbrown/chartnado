@@ -66,6 +66,11 @@ describe Chartnado::Series do
         expect(series_sum(2,[[:a, {0 => 3}]])).to eq ([[:a, {0 => 5}]])
       end
     end
+    describe "adding a scalar to an hash of named series" do
+      it "returns each item of the array with a scalar added" do
+        expect(series_sum(2,{'a' => {0 => 3}})).to eq ([['a', {0 => 5}]])
+      end
+    end
     describe "adding two hashes" do
       it "returns each item of the array with a scalar added" do
         expect(series_sum({0 => 1},{0 => 2})).to eq ({0 => 3})
@@ -110,6 +115,12 @@ describe Chartnado::Series do
     describe "ratio of an array of named series to a non-named series" do
       it "returns the ratio" do
         expect(series_ratio([[:series_a, {0 => 1}]],
+                            {0 => 2})).to eq [[:series_a, {0 => 0.5}]]
+      end
+    end
+    describe "ratio of a hash of named series to a non-named series" do
+      it "returns the ratio" do
+        expect(series_ratio([[:series_a, {0 => 1}]].to_h,
                             {0 => 2})).to eq [[:series_a, {0 => 0.5}]]
       end
     end

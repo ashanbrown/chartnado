@@ -45,14 +45,8 @@ module Chartnado
         scalar_sum += scalars.reduce(:+) || 0.0
 
         result =
-          if series.first.is_a?(Hash)
-            keys = series.flat_map(&:keys).uniq
-            keys.reduce({}) do |hash, key|
-              hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
-              hash
-            end
-          elsif wrap(series.first).array_of_named_series?
-            series.flatten(1).group_by(&:first).map do |name, values|
+          if wrap(series.first).dimensions == 3
+            series.map(&:to_a).flatten(1).group_by(&:first).map do |name, values|
               data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
                 values.each do |key, value|
                   hash[key] += value
@@ -62,6 +56,12 @@ module Chartnado
               [
                 name, data
               ]
+            end
+          elsif wrap(series).first.is_a?(Hash)
+            keys = series.flat_map(&:keys).uniq
+            keys.reduce({}) do |hash, key|
+              hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
+              hash
             end
           elsif series.first.is_a?(Array)
             series.map { |s| s.reduce(:+) + scalar_sum }
@@ -78,7 +78,7 @@ module Chartnado
 
         if dimensions > bottom.dimensions
           top_series_by_name = data_by_name
-          if array_of_named_series?
+          if hash_of_named_series? || array_of_named_series?
             top_series_by_name.map do |name, top_values|
               [
                 name,
@@ -115,6 +115,7 @@ module Chartnado
             hash
           end
         else
+          p 'here'
           with_precision(precision, to_f * multiplier.to_f / bottom.to_f)
         end
       end
@@ -138,10 +139,14 @@ module Chartnado
         array? && first.second.is_a?(Hash)
       end
 
+      def hash_of_named_series?
+        hash? && values.first && values.first.is_a?(Hash)
+      end
+
       def dimensions
         return 1 unless respond_to?(:length)
         if hash?
-          if keys.first && keys.first.is_a?(Array)
+          if keys.first && keys.first.is_a?(Array) || hash_of_named_series?
             3
           else
             2
@@ -158,6 +163,7 @@ module Chartnado
       private
 
       def data_by_name
+        return self if hash_of_named_series?
         result = if array_of_named_series?
           reduce({}) do |hash, value|
             hash[value.first] = value.second
