@@ -5,10 +5,6 @@ module Chartnado
         series.class == self ? series : new(series)
       end
 
-      def names
-        map { |key| key.first }.uniq
-      end
-
       def *(val)
         times(val, precision: nil)
       end
