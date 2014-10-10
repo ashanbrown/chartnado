@@ -44,7 +44,7 @@ module Chartnado
         (series, scalars) = [__getobj__, *series].partition { |s| s.respond_to?(:map) }
         scalar_sum += scalars.reduce(:+) || 0.0
 
-        if wrap(series.first).dimensions == 3
+        if has_separate_named_series?
           result = series.map(&:to_a).flatten(1).group_by(&:first).map do |name, values|
             data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
               values.each do |key, value|
@@ -77,8 +77,8 @@ module Chartnado
 
         if dimensions > bottom.dimensions
           top_series_by_name = data_by_name
-          if hash_of_named_series? || array_of_named_series?
-            top_series_by_name.map do |name, top_values|
+          if has_separate_named_series?
+            data_by_name.map do |name, top_values|
               [
                 name,
                 wrap(top_values).
@@ -184,6 +184,10 @@ module Chartnado
 
       def wrap(val)
         self.class[val]
+      end
+
+      def has_separate_named_series?
+        hash_of_named_series? || array_of_named_series?
       end
     end
   end

@@ -71,6 +71,11 @@ describe Chartnado::Series do
         expect(series_sum(2,{'a' => {0 => 3}})).to eq ([['a', {0 => 5}]])
       end
     end
+    describe "adding a scalar to a hash with 2 dimensional keys" do
+      it "returns each item of the array with a scalar added" do
+        expect(series_sum({['a', 0] => 3}, 1)).to eq ({['a', 0] => 4})
+      end
+    end
     describe "adding two hashes" do
       it "returns each item of the array with a scalar added" do
         expect(series_sum({0 => 1},{0 => 2})).to eq ({0 => 3})
