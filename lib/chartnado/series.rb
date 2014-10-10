@@ -33,7 +33,6 @@ module Chartnado
     #
     # @return [Series/Multiple-Series/Scalar]
     def series_sum(*series, scalar_sum: 0.0)
-      return [] unless series.length > 0
       Wrap[series.shift].add(*series, scalar_sum: scalar_sum)
     end
 

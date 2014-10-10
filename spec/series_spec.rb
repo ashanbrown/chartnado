@@ -86,6 +86,11 @@ describe Chartnado::Series do
         expect(series_sum({0 => 1},{0 => 2}, 5)).to eq ({0 => 8})
       end
     end
+    describe "adding nothing but a scalar sum" do
+      it "returns the scalar sum" do
+        expect(series_sum(scalar_sum: 2)).to eq 2
+      end
+    end
   end
 
   describe "#series_ratio" do
