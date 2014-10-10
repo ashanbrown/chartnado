@@ -44,30 +44,29 @@ module Chartnado
         (series, scalars) = [__getobj__, *series].partition { |s| s.respond_to?(:map) }
         scalar_sum += scalars.reduce(:+) || 0.0
 
-        result =
-          if wrap(series.first).dimensions == 3
-            series.map(&:to_a).flatten(1).group_by(&:first).map do |name, values|
-              data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
-                values.each do |key, value|
-                  hash[key] += value
-                end
-                hash
+        if wrap(series.first).dimensions == 3
+          result = series.map(&:to_a).flatten(1).group_by(&:first).map do |name, values|
+            data = values.map(&:second).reduce(Hash.new(scalar_sum)) do |hash, values|
+              values.each do |key, value|
+                hash[key] += value
               end
-              [
-                name, data
-              ]
-            end
-          elsif series.first.is_a?(Hash)
-            keys = series.flat_map(&:keys).uniq
-            keys.reduce({}) do |hash, key|
-              hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
               hash
             end
-          elsif series.first.is_a?(Array)
-            series.map { |s| s.reduce(:+) + scalar_sum }
-          else
-            scalar_sum
+            [
+              name, data
+            ]
           end
+        elsif series.first.is_a?(Hash)
+          keys = series.flat_map(&:keys).uniq
+          result = keys.reduce({}) do |hash, key|
+            hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
+            hash
+          end
+        elsif series.first.is_a?(Array)
+          result = series.map { |s| s.reduce(:+) + scalar_sum }
+        else
+          result = scalar_sum
+        end
 
         wrap(result)
       end
