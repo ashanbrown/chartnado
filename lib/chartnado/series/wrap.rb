@@ -57,7 +57,7 @@ module Chartnado
                 name, data
               ]
             end
-          elsif wrap(series).first.is_a?(Hash)
+          elsif series.first.is_a?(Hash)
             keys = series.flat_map(&:keys).uniq
             keys.reduce({}) do |hash, key|
               hash[key] = (series.map { |s| s[key] }.compact.reduce(:+) || 0) + scalar_sum
