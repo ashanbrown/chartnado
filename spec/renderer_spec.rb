@@ -46,6 +46,18 @@ describe Chartnado::Renderer do
                  {name: :b, data: [[1, 20]]}]
       end
     end
+    describe "for multiple series organized as a hash" do
+      it "can generate chartkick compatible series" do
+        expect(chart_json({:a => {1 => 10}, :b => {1 => 20}})).
+          to eq [{name: :a, data: [[1, 10]]}, {name: :b, data: [[1,20]]}]
+      end
+      it "can add totals" do
+        expect(chart_json({:a => {1 => 10}, :b => {1 => 20}}, show_total: true)).
+          to eq [{name: 'Total', data: [[1, 0]], tooltip: [[1, 30.0]]},
+                 {name: :a, data: [[1, 10]]},
+                 {name: :b, data: [[1, 20]]}]
+      end
+    end
     describe "for data that is just a scalar" do
       it "shows the scalar as the total" do
         expect(chart_json(10)).

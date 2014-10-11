@@ -11,7 +11,7 @@ class Chartnado::Renderer
 
   delegate :controller, to: :context
 
-  def render(*args, **options)
+  def render(*args, ** options)
     json_options = {}
     chartkick_options = options.dup
 
@@ -40,7 +40,7 @@ class Chartnado::Renderer
     }
 
     if options[:wrapper_proc]
-      context.instance_exec(*args, renderer, **options, &options[:wrapper_proc])
+      context.instance_exec(*args, renderer, ** options, &options[:wrapper_proc])
     else
       renderer.call
     end
@@ -49,41 +49,8 @@ class Chartnado::Renderer
   def chart_json(series, show_total: false, reverse_sort: false, percentage: false)
     series = Chartnado::Series::Wrap[series]
     series *= 100.0 if percentage
-    if series.hash?
-      if (key = series.keys.first) and key.is_a?(Array) and key.size == 2
-        totals = Hash.new(0.0)
-        new_series = series.group_by{|k, v| k[0] }.sort_by { |k| k.to_s }
-        new_series = new_series.reverse if reverse_sort
-
-        new_series = new_series.map do |name, data|
-          {
-            name: name,
-            data: data.map do |k, v|
-              totals[k[1]] += v if show_total
-              [k[1], v]
-            end
-          }
-        end
-
-        if show_total
-          [{name: 'Total',
-            data: totals.map {|k,v| [k, 0] },
-            tooltip: totals.map {|k,v| [k, v] }
-           }] + new_series
-        else
-          new_series
-        end
-      else
-        new_series = series.sort_by { |key| key.to_s }
-        new_series = new_series.reverse if reverse_sort
-
-        if show_total
-          new_series << ['Total', new_series.map(&:second).reduce(0, :+)]
-        else
-          new_series
-        end
-      end
-    elsif series.array? && series.first.is_a?(Array)
+    if series.has_separate_named_series?
+      series = series.to_a
       if series.first.second.respond_to?(:map)
         totals = Hash.new(0.0)
         new_series = series.sort_by { |item| item.first.to_s }
@@ -101,8 +68,8 @@ class Chartnado::Renderer
 
         if show_total
           [{name: 'Total',
-            data: totals.map {|k,v| [k, 0] },
-            tooltip: totals.map {|k,v| [k, v] }
+            data: totals.map { |k, v| [k, 0] },
+            tooltip: totals.map { |k, v| [k, v] }
            }] + new_series
         else
           new_series
@@ -117,12 +84,44 @@ class Chartnado::Renderer
           new_series
         end
       end
-    else
-      if series.respond_to?(:map)
-        series
+    elsif series.hash?
+      if (key = series.keys.first) and key.is_a?(Array) and key.size == 2
+        totals = Hash.new(0.0)
+        new_series = series.group_by { |k, v| k[0] }.sort_by { |k| k.to_s }
+        new_series = new_series.reverse if reverse_sort
+
+        new_series = new_series.map do |name, data|
+          {
+            name: name,
+            data: data.map do |k, v|
+              totals[k[1]] += v if show_total
+              [k[1], v]
+            end
+          }
+        end
+
+        if show_total
+          [{name: 'Total',
+            data: totals.map { |k, v| [k, 0] },
+            tooltip: totals.map { |k, v| [k, v] }
+           }] + new_series
+        else
+          new_series
+        end
       else
-        [['Total', series]]
+        new_series = series.sort_by { |key| key.to_s }
+        new_series = new_series.reverse if reverse_sort
+
+        if show_total
+          new_series << ['Total', new_series.map(&:second).reduce(0, :+)]
+        else
+          new_series
+        end
       end
+    elsif series.respond_to?(:map)
+      series
+    else
+      [['Total', series]]
     end
   end
 end
