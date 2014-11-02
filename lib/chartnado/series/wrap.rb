@@ -91,7 +91,7 @@ module Chartnado
           else
             bottom.reduce({}) do |hash, (key, value)|
               top_series_by_name.keys.each do |name|
-                top_key = [name, *key]
+                top_key = [name, *Array.wrap(key)]
                 top_value = top_series_by_name[name][top_key]
                 if top_value
                   hash[top_key] = wrap(top_value).
@@ -176,11 +176,14 @@ module Chartnado
           end
         else
           hash = Hash.new { |hash, key| hash[key] = {} }
-          reduce(hash) do |hash, (key, value)|
+          x = reduce(hash) do |hash, (key, value)|
+            p key.first
             new_key = Array.wrap(key.first).first
             hash[new_key][key] = value
             hash
           end
+          p x
+          x
         end
         wrap(result)
       end

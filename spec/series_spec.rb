@@ -121,6 +121,14 @@ describe Chartnado::Series do
         expect(series_ratio({[:series_a, 0] => 1, [:series_a, 1] => 3},
                             {0 => 2, 1 => 4})).to eq ({[:series_a, 0] => 0.5, [:series_a, 1] => 0.75})
       end
+      describe "when the keys are time values" do
+        let(:t1) { Time.parse('2014-09-15 07:00:00 UTC') }
+        let(:t2) { Time.parse('2014-09-22 07:00:00 UTC') }
+        it "still returns the ratio" do
+          expect(series_ratio({[:series_a, t1] => 1, [:series_a, t2] => 3},
+                              {t1 => 2, t2 => 4})).to eq ({[:series_a, t1] => 0.5, [:series_a, t2] => 0.75})
+        end
+      end
     end
     describe "ratio of an array of named series to a non-named series" do
       it "returns the ratio" do
