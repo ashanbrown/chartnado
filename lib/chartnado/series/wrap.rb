@@ -175,9 +175,10 @@ module Chartnado
             hash
           end
         else
-          reduce({}) do |hash, (key, value)|
+          hash = Hash.new { |hash, key| hash[key] = {} }
+          reduce(hash) do |hash, (key, value)|
             new_key = Array.wrap(key.first).first
-            hash[new_key] = {key => value }
+            hash[new_key][key] = value
             hash
           end
         end

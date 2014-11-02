@@ -118,8 +118,8 @@ describe Chartnado::Series do
     end
     describe "ratio of a named series to a non-named series" do
       it "returns the ratio" do
-        expect(series_ratio({[:series_a, 0] => 1},
-                            {0 => 2})).to eq ({[:series_a, 0] => 0.5})
+        expect(series_ratio({[:series_a, 0] => 1, [:series_a, 1] => 3},
+                            {0 => 2, 1 => 4})).to eq ({[:series_a, 0] => 0.5, [:series_a, 1] => 0.75})
       end
     end
     describe "ratio of an array of named series to a non-named series" do
